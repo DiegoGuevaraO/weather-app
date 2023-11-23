@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
         <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center" sx={{minHeight: '100vh'}}>
-          <Grid item sx={{bgcolor: 'white', borderRadius: '15px', padding: '10px'}}>
+          <Grid item sx={{bgcolor: 'white', borderRadius: '15px', padding: 5}}>
             <Typography
                 variant="h2"
                 align="center"
