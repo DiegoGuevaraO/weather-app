@@ -1,11 +1,31 @@
 "use client";
 
-import { Typography, Card, CardContent, CardActions, Button } from "@mui/material";
+import { Typography, Card, CardContent } from "@mui/material";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export default function Page(){
     const searchParams = useSearchParams();
     const city = searchParams.get('city');
+    const [currentWeather, setCurrentWeather] = useState({
+        system: 'metric',
+        city: '',
+        current: 0,
+        feelsLike: 0,
+        min: 0,
+        max: 0,
+        description: '',
+    });
+
+    fetch(`http://localhost:3000/current?city=${city}`, {
+        method: "GET"
+      },).then((res) => {
+        let data = res.json();
+
+        setCurrentWeather({
+            city: data.main.temp,
+        })
+    });
     
     return(
         <>

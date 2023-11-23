@@ -4,11 +4,12 @@ import { TextField, IconButton, InputAdornment } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SearchBar(){
   const [city, setCity] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleChange = (city: string) => {
     setCity(city);
@@ -48,6 +49,7 @@ export default function SearchBar(){
               onKeyDown={(e) => {
                 handleKeyDown(e);
               }}
+              defaultValue={searchParams.get('city')?.toString()}
           />
       </div>
   );

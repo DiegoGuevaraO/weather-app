@@ -1,8 +1,8 @@
 import axios from "axios";
+import { NextResponse } from "next/server";
 
 
 export async function GET(req: Request) {
-    // return NextResponse.json({message: 'Prueba de API'}, {status: 200});
     const { searchParams } = new URL(req.url);
     const city = searchParams.get('city');
 
@@ -10,5 +10,5 @@ export async function GET(req: Request) {
     
     const { data } = await axios.get(url);
 
-    return Response.json(data);
+    return NextResponse.json(data);
 }
