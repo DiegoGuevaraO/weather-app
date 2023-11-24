@@ -1,8 +1,9 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
+import type { Weather } from "../lib/types";
 
 
-export async function GET(req: Request) {
+export async function GET(req: Request, res: NextResponse<{current: Weather}>){
     const { searchParams } = new URL(req.url);
     const city = searchParams.get('city');
 
@@ -10,5 +11,14 @@ export async function GET(req: Request) {
     
     const { data } = await axios.get(url);
 
-    return NextResponse.json(data);
+    const current = {
+        city: data.name,
+        current: data.main.temp,
+        feelsLike: data.main.feels_like,
+        min: data.main.temp_min,
+        max: data.main.temp_max,
+        description: data.weather.main,
+    };
+
+    return NextResponse.json(current);
 }

@@ -2,13 +2,15 @@
 
 import { Typography, Card, CardContent } from "@mui/material";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import type { Weather } from "../lib/types";
+import { useState, useEffect } from "react";
 
 export default function Page(){
     const searchParams = useSearchParams();
-    const city = searchParams.get('city');
-    const [currentWeather, setCurrentWeather] = useState({
-        system: 'metric',
+    const cityFetch = searchParams.get('city');
+    const [isLoading, setIsLoading] = useState(true);
+    const [system, setSystem] = useState('metric');
+    const [currentWeather, setCurrentWeather] = useState<Weather>({
         city: '',
         current: 0,
         feelsLike: 0,
@@ -17,15 +19,36 @@ export default function Page(){
         description: '',
     });
 
-    fetch(`http://localhost:3000/current?city=${city}`, {
-        method: "GET"
-      },).then((res) => {
-        let data = res.json();
+    useEffect(() => {
+        fetch(`http://localhost:3000/current?city=${cityFetch}`, {
+            method: "GET"},)
+            .then((response) => response.json())
+            .then((current) => {
+                setCurrentWeather({
+                    city: current.city,
+                    current: current.current,
+                    feelsLike: current.feelsLike,
+                    min: current.min,
+                    max: current.max,
+                    description: current.description,
+                })
+                validateSystem();
+            });
+    }, [])
 
-        setCurrentWeather({
-            city: data.main.temp,
-        })
-    });
+
+    function validateSystem() {
+        if (system === 'metric') {
+            setCurrentWeather((prev) => ({
+                city: prev.city,
+                current: prev.current - 273.15,
+                feelsLike: prev.feelsLike - 273.15,
+                min: prev.min - 273.15,
+                max: prev.max - 273.15,
+                description: prev.description,
+            }))
+        }
+    }
     
     return(
         <>
@@ -33,24 +56,24 @@ export default function Page(){
                 <CardContent>
                     {/* City Name */}
                     <Typography variant="h5" component="div" textAlign="center">
-                    {city}
+                    {currentWeather.city}
                     </Typography>
                     {/* Current degrees */}
                     <Typography sx={{padding: 2}} variant="h5" component="div" textAlign="center">
-                        21°
+                        {currentWeather.current}°
                         <br />
                     </Typography>
                     {/* Feels like */}
                     <Typography sx={{ fontSize: 14, padding: 1}} color="text.secondary" textAlign="center">
-                    Feels like: 19°
+                    Feels like: {currentWeather.feelsLike}°
                     </Typography>
                     {/* Min Max */}
                     <Typography sx={{ mb: 1.5 }} color="text.secondary" textAlign="center">
-                    Min: 9° Max: 21°
+                    Min: {currentWeather.min}° Max: {currentWeather.max}°
                     </Typography>
                     {/* Weather description */}
                     <Typography variant="body1" textAlign="center">
-                    Cloudy
+                    {currentWeather.description}
                     </Typography>
                 </CardContent>
             </Card>
