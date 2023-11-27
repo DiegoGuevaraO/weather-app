@@ -20,7 +20,7 @@ export default function Page(){
     });
 
     useEffect(() => {
-        fetch(`http://localhost:3000/current?city=${cityFetch}`, {
+        fetch(`/current?city=${cityFetch}`, {
             method: "GET"},)
             .then((response) => response.json())
             .then((current) => {
