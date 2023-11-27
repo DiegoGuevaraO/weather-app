@@ -1,15 +1,15 @@
 "use client";
 
-import { Typography, Card, CardContent } from "@mui/material";
+import { Typography, Card, CardContent, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import type { Weather } from "../lib/types";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function Page(){
     const searchParams = useSearchParams();
     const cityFetch = searchParams.get('city');
     const [isLoading, setIsLoading] = useState(true);
-    const [system, setSystem] = useState('metric');
+    const [system, setSystem] = useState('celsius');
     const [currentWeather, setCurrentWeather] = useState<Weather>({
         city: '',
         current: 0,
@@ -38,16 +38,30 @@ export default function Page(){
 
 
     function validateSystem() {
-        if (system === 'metric') {
+        if (system === 'celsius') {
             setCurrentWeather((prev) => ({
                 city: prev.city,
-                current: prev.current - 273.15,
-                feelsLike: prev.feelsLike - 273.15,
-                min: prev.min - 273.15,
-                max: prev.max - 273.15,
+                current: Math.round(prev.current - 273.15),
+                feelsLike: Math.round(prev.feelsLike - 273.15),
+                min: Math.round(prev.min - 273.15),
+                max: Math.round(prev.max - 273.15),
+                description: prev.description,
+            }))
+        } else if (system === 'farenheit') {
+            setCurrentWeather((prev) => ({
+                city: prev.city,
+                current: Math.round(((prev.current) * 1.8) + 32),
+                feelsLike: Math.round(((prev.feelsLike) * 1.8) + 32),
+                min: Math.round(((prev.min) * 1.8) + 32),
+                max: Math.round(((prev.max) * 1.8) + 32),
                 description: prev.description,
             }))
         }
+    }
+
+    function handleScaleChange(e: React.MouseEvent<HTMLElement>, scale: string) {
+        setSystem(scale);
+        validateSystem();
     }
     
     return(
@@ -75,6 +89,17 @@ export default function Page(){
                     <Typography variant="body1" textAlign="center">
                     {currentWeather.description}
                     </Typography>
+                    <ToggleButtonGroup
+                        color="primary"
+                        exclusive
+                        aria-label="Scale"
+                        fullWidth
+                        value={system}
+                        onChange={handleScaleChange}
+                        >
+                        <ToggleButton value="celsius">°C</ToggleButton>
+                        <ToggleButton value="farenheit">°F</ToggleButton>
+                    </ToggleButtonGroup>
                 </CardContent>
             </Card>
         </>
