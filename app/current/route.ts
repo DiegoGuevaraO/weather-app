@@ -17,7 +17,7 @@ export async function GET(req: Request, res: NextResponse<{current: Weather}>){
         feelsLike: data.main.feels_like,
         min: data.main.temp_min,
         max: data.main.temp_max,
-        description: data.weather.main,
+        description: data.weather[0].main,
     };
 
     return NextResponse.json(current);

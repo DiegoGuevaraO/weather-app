@@ -1,9 +1,10 @@
 "use client";
 
-import { Typography, Card, CardContent, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { Typography, Card, CardContent, ButtonGroup, Button } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import type { Weather } from "../lib/types";
 import React, { useState, useEffect } from "react";
+import { toCelsius, toFarenheit } from "../lib/degrees";
 
 export default function Page(){
     const searchParams = useSearchParams();
@@ -39,29 +40,35 @@ export default function Page(){
 
     function validateSystem() {
         if (system === 'celsius') {
+            console.log('Cambio a celsius');
             setCurrentWeather((prev) => ({
                 city: prev.city,
-                current: Math.round(prev.current - 273.15),
-                feelsLike: Math.round(prev.feelsLike - 273.15),
-                min: Math.round(prev.min - 273.15),
-                max: Math.round(prev.max - 273.15),
+                current: toCelsius(prev.current),
+                feelsLike: toCelsius(prev.feelsLike),
+                min: toCelsius(prev.min),
+                max: toCelsius(prev.max),
                 description: prev.description,
             }))
         } else if (system === 'farenheit') {
+            console.log('Cambio a farenheit');
             setCurrentWeather((prev) => ({
                 city: prev.city,
-                current: Math.round(((prev.current) * 1.8) + 32),
-                feelsLike: Math.round(((prev.feelsLike) * 1.8) + 32),
-                min: Math.round(((prev.min) * 1.8) + 32),
-                max: Math.round(((prev.max) * 1.8) + 32),
+                current: toFarenheit(prev.current),
+                feelsLike: toFarenheit(prev.feelsLike),
+                min: toFarenheit(prev.min),
+                max: toFarenheit(prev.max),
                 description: prev.description,
             }))
         }
     }
 
-    function handleScaleChange(e: React.MouseEvent<HTMLElement>, scale: string) {
+    function handleScaleChange(e: React.MouseEvent<HTMLButtonElement>) {
+        let scale = e.currentTarget.value;
         setSystem(scale);
-        validateSystem();
+        
+        if (scale !== system) {
+            validateSystem();
+        }
     }
     
     return(
@@ -86,20 +93,19 @@ export default function Page(){
                     Min: {currentWeather.min}° Max: {currentWeather.max}°
                     </Typography>
                     {/* Weather description */}
-                    <Typography variant="body1" textAlign="center">
+                    <Typography sx={{ paddingBottom: 2}} variant="body1" textAlign="center">
                     {currentWeather.description}
                     </Typography>
-                    <ToggleButtonGroup
-                        color="primary"
-                        exclusive
-                        aria-label="Scale"
+                    <ButtonGroup
+                        disableElevation
+                        variant="outlined"
+                        aria-label="Scale button"
                         fullWidth
-                        value={system}
-                        onChange={handleScaleChange}
+                        color="info"
                         >
-                        <ToggleButton value="celsius">°C</ToggleButton>
-                        <ToggleButton value="farenheit">°F</ToggleButton>
-                    </ToggleButtonGroup>
+                        <Button value="celsius" onClick={(e) => handleScaleChange(e)}>°C</Button>
+                        <Button value="farenheit" onClick={(e) => handleScaleChange(e)}>°F</Button>
+                    </ButtonGroup>
                 </CardContent>
             </Card>
         </>
