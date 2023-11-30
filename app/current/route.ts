@@ -4,6 +4,7 @@ import type { Weather } from "../lib/types";
 
 
 export async function GET(req: Request, res: NextResponse<{current: Weather}>){
+    console.log('FETCHING...');
     const { searchParams } = new URL(req.url);
     const city = searchParams.get('city');
 

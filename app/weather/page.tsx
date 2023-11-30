@@ -1,6 +1,6 @@
 "use client";
 
-import { Typography, Card, CardContent, ButtonGroup, Button } from "@mui/material";
+import { Typography, Card, CardContent, ButtonGroup, Button, Skeleton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import type { Weather } from "../lib/types";
 import React, { useState, useEffect } from "react";
@@ -21,6 +21,7 @@ export default function Page(){
     });
 
     useEffect(() => {
+        setIsLoading(true);
         fetch(`/current?city=${cityFetch}`, {
             method: "GET"},)
             .then((response) => response.json())
@@ -33,14 +34,14 @@ export default function Page(){
                     max: current.max,
                     description: current.description,
                 })
-                validateSystem();
+                validateSystem('celsius');
+                setIsLoading(false);
             });
-    }, [])
+    }, [searchParams])
 
 
-    function validateSystem() {
-        if (system === 'celsius') {
-            console.log('Cambio a celsius');
+    function validateSystem(scale: string) {
+        if (scale === 'celsius') {
             setCurrentWeather((prev) => ({
                 city: prev.city,
                 current: toCelsius(prev.current),
@@ -49,8 +50,7 @@ export default function Page(){
                 max: toCelsius(prev.max),
                 description: prev.description,
             }))
-        } else if (system === 'farenheit') {
-            console.log('Cambio a farenheit');
+        } else if (scale === 'farenheit') {
             setCurrentWeather((prev) => ({
                 city: prev.city,
                 current: toFarenheit(prev.current),
@@ -64,15 +64,33 @@ export default function Page(){
 
     function handleScaleChange(e: React.MouseEvent<HTMLButtonElement>) {
         let scale = e.currentTarget.value;
-        setSystem(scale);
         
         if (scale !== system) {
-            validateSystem();
+            validateSystem(scale);
         }
+
+        setSystem(scale);
     }
     
     return(
         <>
+            {isLoading ? 
+            <Card sx={{ minWidth: 275 }}>
+                <CardContent>
+                    {/* City Name */}
+                    <Skeleton variant="text" height={50} width={200} sx={{margin: "auto"}} animation="wave" />
+                    {/* Current degrees */}
+                    <Skeleton variant="text" height={50} width={50} sx={{margin: "auto"}} animation="wave" />
+                    {/* Feels like */}
+                    <Skeleton variant="text" height={20} width={100} sx={{margin: "auto"}} animation="wave" />
+                    {/* Min Max */}
+                    <Skeleton variant="rectangular" height={30} width={200} sx={{margin: "auto"}} animation="wave" />
+                    {/* Weather description */}
+                    <Skeleton variant="rectangular" height={30} width={100} sx={{margin: "auto"}} animation="wave" />
+                    <Skeleton variant="rectangular" height={40} width={300} sx={{margin: "auto"}} animation="wave" />
+                </CardContent>
+            </Card>
+            :
             <Card sx={{ minWidth: 275 }}>
                 <CardContent>
                     {/* City Name */}
@@ -108,6 +126,7 @@ export default function Page(){
                     </ButtonGroup>
                 </CardContent>
             </Card>
+            }
         </>
     );
 }
